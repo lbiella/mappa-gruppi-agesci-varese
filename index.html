@@ -12,6 +12,15 @@ body {
   margin: 0;
   padding: 0;
   width: 100%;
+      if (activePopup && activePopup !== popup) {
+      activePopup.remove();
+    }
+    activePopup = popup;
+let activePopup = null;
+            popup.on("close", () => {
+      if (activePopup === popup) activePopup = null;
+    });,
+        offset: [-8, 0]
   height: 100%;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: #f6f4f8;
