@@ -91,6 +91,40 @@ function markerElement(properties, popup) {
   return element;
 }
 
+async function addBoundaryLayer() {
+  if (document.documentElement.dataset.agesciBoundaryReady === "true") return;
+  const response = await fetch("data/confine_zona.geojson");
+  const boundary = await response.json();
+
+  agesciMap.addSource("confine-zona", {
+    type: "geojson",
+    data: boundary
+  });
+
+  agesciMap.addLayer({
+    id: "confine-zona-fill",
+    type: "fill",
+    source: "confine-zona",
+    paint: {
+      "fill-color": "#6a3d9a",
+      "fill-opacity": 0
+    }
+  });
+
+  agesciMap.addLayer({
+    id: "confine-zona-line",
+    type: "line",
+    source: "confine-zona",
+    paint: {
+      "line-color": "#6a3d9a",
+      "line-width": 2,
+      "line-opacity": 0.75
+    }
+  });
+
+  document.documentElement.dataset.agesciBoundaryReady = "true";
+}
+
 async function addGroupLayers() {
   if (document.documentElement.dataset.agesciGroupsReady === "true") return;
   const response = await fetch("data/gruppi_scout.geojson");
@@ -125,8 +159,13 @@ async function addGroupLayers() {
   });
 }
 
+async function initializeMapLayers() {
+  await addBoundaryLayer();
+  await addGroupLayers();
+}
+
 if (agesciMap.loaded()) {
-  addGroupLayers();
+  initializeMapLayers();
 } else {
-  agesciMap.on("load", addGroupLayers);
+  agesciMap.on("load", initializeMapLayers);
 }
